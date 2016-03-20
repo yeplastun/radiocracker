@@ -12,7 +12,7 @@ This is an example of cutting an audio stream to 5 sec. pieces.
 def run():
     request_stream = requests.get(constants.URL, stream=True)
     request_stream.raw.decode_content = True
-    stream_iter = request_stream.iter_content(1024)
+    stream_iter = request_stream.iter_content(10240)
 
     streams = [BytesIO() for o in range(5)]
 
