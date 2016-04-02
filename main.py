@@ -1,32 +1,33 @@
-import logging
-import threading
-import time
-import datetime
 import requests
-from io import BytesIO
-import constants
-from cutting_example import run
-
-logging.basicConfig(level=logging.DEBUG,
-                    format='(%(threadName)-10s) %(message)s',
-                    )
+from time import strftime
+from multiprocessing import Process
+from processing import recognize
+from fingerprint import fingerprint
+from scipy.io import wavfile
 
 
-def check_audio(piece):
-    if piece:  # TODO: compare audios, if it returns true it should exit
-        send_message()
-        exit()
+"""
+This is an example of cutting an audio stream to 5 sec. pieces.
+"""
+
+PHONE = "8(495) 995-10-57"
+URL = "http://icecast.rmg.cdnvideo.ru/rr.mp3"
+EXAMPLE = "records/cutted_example.wav"
 
 
-def get_time_to_the_summer():
-    logging.debug('Time to the summer')
-    # TODO: it should return datetime to the summer
-
-
-def send_message():
-    date = get_time_to_the_summer()
-
-    # it should create 5 items about 5 seconds each with offset (1 sec).
+def run():
+    _, example = wavfile.read(EXAMPLE)
+    example_hash = set(x[0] for x in fingerprint(example))
+    request_stream = requests.get(URL, stream=True)
+    request_stream.raw.decode_content = True
+    stream_iter = request_stream.iter_content(2 ** 17)
+    for chunk in stream_iter:
+        filename = strftime("tmp/%H-%M-%S.mp3")
+        f = open(filename, "wb")
+        f.write(chunk)
+        f.close()
+        p = Process(target=recognize, args=(filename, example_hash))
+        p.start()
 
 if __name__ == "__main__":
     run()
