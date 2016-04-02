@@ -10,7 +10,6 @@ from scipy.io import wavfile
 This is an example of cutting an audio stream to 5 sec. pieces.
 """
 
-PHONE = "8(495) 995-10-57"
 URL = "http://icecast.rmg.cdnvideo.ru/rr.mp3"
 EXAMPLE = "records/cutted_example.wav"
 
