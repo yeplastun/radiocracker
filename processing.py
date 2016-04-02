@@ -21,13 +21,11 @@ def chunks(l, n):
         yield l[i:i + n]
 
 
-def convert(filename):
-    wavname = filename[:-3] + "wav"
+def convert(filename, wavname):
     call(["mpg123", "-w", wavname, filename],
          stdout=FNULL, stderr=STDOUT)
     _, record = wavfile.read(wavname)
     record = record[:, 0]
-    call(["rm", filename, wavname], stdout=FNULL, stderr=STDOUT)
     return record
 
 
@@ -49,11 +47,15 @@ def send_message():
 
 
 def recognize(filename, example_hash):
-    record = convert(filename)
+    wavname = filename[:-3] + "wav"
+    record = convert(filename, wavname)
     density = np.array([len(example_hash.intersection(
         set(x[0] for x in fingerprint(chunk))))
         for chunk in chunks(record, 2048)])
     if np.max(density) >= 4:
         send_message()
+        call(["rm", filename], stdout=FNULL, stderr=STDOUT)
+    else:
+        call(["rm", filename, wavname], stdout=FNULL, stderr=STDOUT)
     print (strftime("%H-%M-%S") + " - Density mean:",
            np.mean(density), "Max Value: ", np.max(density))
