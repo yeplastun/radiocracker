@@ -6,13 +6,17 @@ from fingerprint import fingerprint
 from time import strftime
 from datetime import datetime
 from requests import get
+import telegram
 
 PHONE = "84959951057"
 KEYS = {"6F746934-B02C-FFFE-18F6-E0BB24A791E3": "79629608747",
         "3F6A479C-1FBA-0810-3B64-A32A4DC97189": "79651055295",
         "E69B08ED-D14C-4695-037F-7ECE6403179D": "79250745534"}
+TOKEN = "172147185:AAG0qfWa1eXK64EErXoK-UUAbbPsa8y9R-8"
 FNULL = open(os.devnull, 'w')
 URL = "http://sms.ru/sms/send"
+IDS = set([35787351, 36350301, 44115250])
+BOT = telegram.Bot(token="172147185:AAG0qfWa1eXK64EErXoK-UUAbbPsa8y9R-8")
 
 
 def chunks(l, n):
@@ -35,15 +39,11 @@ def get_time_to_summer():
 
 
 def send_message():
-    text = "HoursLeft:+" + str(get_time_to_summer()) + ";;"
-    text += "Call:+" + PHONE
-    print strftime("%H-%M-%S") + " - SIGNAAAAAAAAAAAAAAAAL!!!!!!!!!!!"
-    for key, number in KEYS:
-        params = {"api_id": key,
-                  "to": number,
-                  "text": text,
-                  }
-        get(URL, params=params)
+    text = "HoursLeft: " + str(get_time_to_summer()) + "\n"
+    text += "Call: " + PHONE + "\n"
+    text += "Now: " + strftime("%H-%M-%S")
+    for id in IDS:
+        BOT.sendMessage(chat_id=id, text=text)
 
 
 def recognize(filename, example_hash):
@@ -53,6 +53,7 @@ def recognize(filename, example_hash):
         set(x[0] for x in fingerprint(chunk))))
         for chunk in chunks(record, 2048)])
     if np.max(density) >= 4:
+        print strftime("%H-%M-%S") + " - SIGNAAAAAAAAAAAAAAAAL!!!!!!!!!!!"
         send_message()
         call(["rm", filename], stdout=FNULL, stderr=STDOUT)
     else:
