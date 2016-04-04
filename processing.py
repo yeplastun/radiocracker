@@ -20,8 +20,8 @@ KEYS = {"6F746934-B02C-FFFE-18F6-E0BB24A791E3": "79629608747",
 TOKEN = "172147185:AAG0qfWa1eXK64EErXoK-UUAbbPsa8y9R-8"
 FNULL = open(os.devnull, 'w')
 URL = "http://sms.ru/sms/send"
-IDS = set([35787351, 36350301, 44115250, 675729])
 BOT = telegram.Bot(token="172147185:AAG0qfWa1eXK64EErXoK-UUAbbPsa8y9R-8")
+IDS = set(upd.to_dict()['message']['from']['id'] for upd in BOT.getUpdates())
 
 
 def chunks(l, n):
@@ -35,6 +35,7 @@ def convert(filename, wavname):
          stdout=FNULL, stderr=STDOUT)
     _, record = wavfile.read(wavname)
     record = record[:, 0]
+    call(["rm", wavname], stdout=FNULL, stderr=STDOUT)
     return record
 
 
@@ -43,15 +44,20 @@ def get_time_to_summer():
     return 24 * (62 - time.day) - (time.hour + 1)
 
 
-def send_message():
+def send_message(filename):
     text = "HoursLeft: " + str(get_time_to_summer()) + "\n"
     text += "Call: " + PHONE + "\n"
     text += "Now: " + strftime("%H-%M-%S")
     for id in IDS:
+        file = open(filename, "rb")
         BOT.sendMessage(chat_id=id, text=text)
+        BOT.sendAudio(chat_id=id, audio=file)
+        file.close()
 
 
 def recognize(filename, example_hash):
+    print IDS
+    return
     wavname = filename[:-3] + "wav"
     record = convert(filename, wavname)
     density = np.array([len(example_hash.intersection(
@@ -62,7 +68,6 @@ def recognize(filename, example_hash):
     if np.max(density) >= 4:
         logging.warning(
             strftime("%H-%M-%S") + " - SIGNAAAAAAAAAAAAAAAAL!!!!!!!!!!!")
-        send_message()
-        call(["rm", filename], stdout=FNULL, stderr=STDOUT)
+        send_message(filename)
     else:
-        call(["rm", filename, wavname], stdout=FNULL, stderr=STDOUT)
+        call(["rm", filename], stdout=FNULL, stderr=STDOUT)
