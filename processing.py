@@ -1,12 +1,17 @@
 import numpy as np
 import os
+import telegram
+import logging
 from subprocess import *
 from scipy.io import wavfile
 from fingerprint import fingerprint
 from time import strftime
 from datetime import datetime
-from requests import get
-import telegram
+
+logging.basicConfig(
+    format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s',
+    level=logging.INFO, filename=u'mylog.log')
+
 
 PHONE = "84959951057"
 KEYS = {"6F746934-B02C-FFFE-18F6-E0BB24A791E3": "79629608747",
@@ -52,11 +57,12 @@ def recognize(filename, example_hash):
     density = np.array([len(example_hash.intersection(
         set(x[0] for x in fingerprint(chunk))))
         for chunk in chunks(record, 2048)])
+    logging.info("Density mean: " + str(np.mean(density)) +
+                 " Max Value: " + str(np.max(density)))
     if np.max(density) >= 4:
-        print strftime("%H-%M-%S") + " - SIGNAAAAAAAAAAAAAAAAL!!!!!!!!!!!"
+        logging.warning(
+            strftime("%H-%M-%S") + " - SIGNAAAAAAAAAAAAAAAAL!!!!!!!!!!!")
         send_message()
         call(["rm", filename], stdout=FNULL, stderr=STDOUT)
     else:
         call(["rm", filename, wavname], stdout=FNULL, stderr=STDOUT)
-    print (strftime("%H-%M-%S") + " - Density mean:",
-           np.mean(density), "Max Value: ", np.max(density))
