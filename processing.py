@@ -7,6 +7,7 @@ from scipy.io import wavfile
 from fingerprint import fingerprint
 from time import strftime
 from datetime import datetime
+from multiprocessing import Process
 
 logging.basicConfig(
     format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s',
@@ -45,6 +46,15 @@ def get_time_to_summer():
     return 24 * (62 - time.day) - (time.hour + 1)
 
 
+def make_long_record(filename):
+    f = open("dossie/" + filename[4:], "wb")
+    request_stream = requests.get(URL, stream=True)
+    request_stream.raw.decode_content = True
+    content = request_stream.read(2 ** 20)
+    f.write(content)
+    f.close()
+
+
 def send_message(filename):
     text = u"4asov do leta: " + str(get_time_to_summer()) + "\n"
     text += u"Zvonit' po nomeru: " + PHONE + "\n"
@@ -54,6 +64,8 @@ def send_message(filename):
         BOT.sendMessage(chat_id=id, text=text)
         BOT.sendAudio(chat_id=id, audio=file)
         file.close()
+    p = Process(target=make_long_record, args=(filename,))
+    p.start()
 
 
 def recognize(filename, example_hash):

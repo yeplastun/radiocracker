@@ -17,7 +17,7 @@ def run():
     request_stream.raw.decode_content = True
     stream_iter = request_stream.iter_content(2 ** 17)
     for chunk in stream_iter:
-        filename = strftime("tmp/%H-%M-%S-%f.mp3")
+        filename = strftime("tmp/%H-%M-%S.mp3")
         f = open(filename, "wb")
         f.write(chunk)
         f.close()
