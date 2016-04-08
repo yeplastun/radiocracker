@@ -20,7 +20,7 @@ KEYS = {"6F746934-B02C-FFFE-18F6-E0BB24A791E3": "79629608747",
 TOKEN = "172147185:AAG0qfWa1eXK64EErXoK-UUAbbPsa8y9R-8"
 FNULL = open(os.devnull, 'w')
 URL = "http://sms.ru/sms/send"
-BOT = telegram.Bot(token="172147185:AAG0qfWa1eXK64EErXoK-UUAbbPsa8y9R-8")
+BOT = telegram.Bot(token=TOKEN)
 IDS = set([44115250, 36350301, 35787351, 675729, 117901733, 46696164])
 # IDS = set(upd.to_dict()['message']['from']['id'] for upd in BOT.getUpdates())
 
