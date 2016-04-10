@@ -14,7 +14,7 @@ logging.basicConfig(
     level=logging.INFO, filename=u'mylog.log')
 
 
-PHONE = "84959951057"
+PHONE = "+74959951057"
 KEYS = {"6F746934-B02C-FFFE-18F6-E0BB24A791E3": "79629608747",
         "3F6A479C-1FBA-0810-3B64-A32A4DC97189": "79651055295",
         "E69B08ED-D14C-4695-037F-7ECE6403179D": "79250745534"}
@@ -50,7 +50,7 @@ def make_long_record(filename):
     f = open("dossie/" + filename[4:], "wb")
     request_stream = requests.get(URL, stream=True)
     request_stream.raw.decode_content = True
-    content = request_stream.read(2 ** 20)
+    content = request_stream.read(2 ** 22)
     f.write(content)
     f.close()
 
