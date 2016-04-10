@@ -20,7 +20,7 @@ KEYS = {"6F746934-B02C-FFFE-18F6-E0BB24A791E3": "79629608747",
         "E69B08ED-D14C-4695-037F-7ECE6403179D": "79250745534"}
 TOKEN = "172147185:AAG0qfWa1eXK64EErXoK-UUAbbPsa8y9R-8"
 FNULL = open(os.devnull, 'w')
-URL = "http://sms.ru/sms/send"
+URL = "http://icecast.rmg.cdnvideo.ru/rr.mp3"
 BOT = telegram.Bot(token=TOKEN)
 IDS = set([44115250, 36350301, 35787351, 675729, 117901733, 46696164])
 # IDS = set(upd.to_dict()['message']['from']['id'] for upd in BOT.getUpdates())
@@ -46,12 +46,13 @@ def get_time_to_summer():
     return 24 * (62 - time.day) - (time.hour + 1)
 
 
-def make_long_record(filename):
-    f = open("dossie/" + filename[4:], "wb")
+def make_long_record():
+    f = open(strftime("dossie/Apr%d:%H-%M-%S.mp3"), "wb")
     request_stream = requests.get(URL, stream=True)
     request_stream.raw.decode_content = True
-    content = request_stream.read(2 ** 22)
-    f.write(content)
+    for chunk in request_stream.iter_content(2 ** 22):
+        f.write(content)
+        break
     f.close()
 
 
@@ -64,7 +65,7 @@ def send_message(filename):
         BOT.sendMessage(chat_id=id, text=text)
         BOT.sendAudio(chat_id=id, audio=file)
         file.close()
-    p = Process(target=make_long_record, args=(filename,))
+    p = Process(target=make_long_record, args=())
     p.start()
 
 
