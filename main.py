@@ -15,7 +15,7 @@ def run():
     example_hash = set(x[0] for x in fingerprint(example))
     request_stream = requests.get(URL, stream=True)
     request_stream.raw.decode_content = True
-    stream_iter = request_stream.iter_content(2 ** 16)
+    stream_iter = request_stream.iter_content(2 ** 17)
     for chunk in stream_iter:
         filename = strftime("tmp/%H-%M-%S.mp3")
         f = open(filename, "wb")
