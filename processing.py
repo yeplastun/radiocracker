@@ -2,6 +2,7 @@ import numpy as np
 import os
 import telegram
 import logging
+import requests
 from subprocess import *
 from scipy.io import wavfile
 from fingerprint import fingerprint
@@ -47,13 +48,13 @@ def get_time_to_summer():
 
 
 def make_long_record():
-    f = open(strftime("dossie/Apr%d:%H-%M-%S.mp3"), "wb")
     request_stream = requests.get(URL, stream=True)
     request_stream.raw.decode_content = True
     for chunk in request_stream.iter_content(2 ** 22):
-        f.write(content)
+        f = open(strftime("dossie/Apr%d:%H-%M-%S.mp3"), "wb")
+        f.write(chunk)
+        f.close()
         break
-    f.close()
 
 
 def send_message(filename):
